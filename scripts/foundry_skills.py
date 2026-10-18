@@ -64,7 +64,7 @@ def pin_staging(skill: str, version: str) -> None:
         )
         # Nowa wersja toolboxa NIE jest aktywna, dopóki jej nie promujesz -
         # bez tego endpoint MCP stagingu dalej serwowałby starą wersję skilla.
-        p.toolboxes.update(toolbox_name=toolbox, default_version=tv.version)
+        p.toolboxes.update(name=toolbox, default_version=tv.version)
         print(f"{toolbox} -> aktywna wersja toolboxa {tv.version} ({skill} v{version})")
 
 

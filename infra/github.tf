@@ -6,7 +6,7 @@ data "github_user" "reviewer" {
 locals {
   gh_vars = {
     FOUNDRY_PROJECT_ENDPOINT = local.project_endpoint
-    AZURE_CLIENT_ID          = azuread_application.gh.client_id
+    AZURE_CLIENT_ID          = azurerm_user_assigned_identity.gh.client_id
     AZURE_TENANT_ID          = data.azurerm_client_config.current.tenant_id
     AZURE_SUBSCRIPTION_ID    = var.subscription_id
     JUDGE_MODEL_DEPLOYMENT   = azapi_resource.model.name

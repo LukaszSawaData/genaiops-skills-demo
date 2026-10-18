@@ -71,7 +71,7 @@ def ensure_skill(p: AIProjectClient) -> str:
 
 def ensure_toolbox(p: AIProjectClient, name: str, pinned_version: str | None) -> None:
     try:
-        versions = list(p.toolboxes.list_toolbox_versions(name=name))
+        versions = list(p.toolboxes.list_versions(name=name))
     except ResourceNotFoundError:
         versions = []
     if versions:
