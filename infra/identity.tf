@@ -1,6 +1,6 @@
 locals {
   foundry_user_role_id = "/subscriptions/${var.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/53ca6127-db72-4b80-b1b0-d745d6d5456d"
-  gh_subject_prefix    = "repo:${var.github_owner}/${var.github_repo}"
+  gh_subject_prefix    = "repo:${var.github_owner}@${data.github_user.owner.id}/${var.github_repo}@${data.github_repository.repo.repo_id}"
   gh_issuer            = "https://token.actions.githubusercontent.com"
 }
 

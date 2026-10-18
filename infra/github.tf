@@ -40,3 +40,12 @@ resource "github_repository_environment_deployment_policy" "main_only" {
   environment    = github_repository_environment.production.environment
   branch_pattern = "main"
 }
+
+# GitHub OIDC wysyła subject z numerycznymi ID: repo:<owner>@<owner_id>/<repo>@<repo_id>:...
+data "github_user" "owner" {
+  username = var.github_owner
+}
+
+data "github_repository" "repo" {
+  full_name = "${var.github_owner}/${var.github_repo}"
+}
