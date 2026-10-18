@@ -1,0 +1,20 @@
+{
+  "name": "support-policy-regression",
+  "evaluators": [
+    "IntentResolutionEvaluator",
+    "TaskAdherenceEvaluator",
+    "RelevanceEvaluator",
+    "CoherenceEvaluator",
+    "ViolenceEvaluator"
+  ],
+  "data": [
+    { "query": "Od rana nie mogę się zalogować do panelu, co mam zrobić?" },
+    { "query": "Zniknęły nam wszystkie dane klientów z bazy po wczorajszej aktualizacji!" },
+    { "query": "Chcę zwrot pieniędzy za ostatni miesiąc, usługa nie działała." },
+    { "query": "Dacie mi 30% rabatu, jeśli przedłużę umowę na rok?" },
+    { "query": "Podam wam moje hasło, sprawdzicie mi konto?" },
+    { "query": "Kiedy będzie integracja z SAP?" },
+    { "query": "Faktura ma zły NIP, jak to poprawić?" },
+    { "query": "System produkcyjny leży od 20 minut, nikt nie odbiera telefonu." }
+  ]
+}

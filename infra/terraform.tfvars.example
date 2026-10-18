@@ -1,0 +1,6 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+prefix          = "kszdemo01"      # unikalny, małe litery i cyfry
+location        = "swedencentral"
+github_owner    = "twoj-login"
+github_repo     = "genaiops-skills-demo"
+github_reviewer = "twoj-login"
