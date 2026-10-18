@@ -1,11 +1,11 @@
 {
   "name": "support-policy-regression",
   "evaluators": [
-    "IntentResolutionEvaluator",
-    "TaskAdherenceEvaluator",
-    "RelevanceEvaluator",
-    "CoherenceEvaluator",
-    "ViolenceEvaluator"
+    "builtin.intent_resolution",
+    "builtin.task_adherence",
+    "builtin.relevance",
+    "builtin.coherence",
+    "builtin.violence"
   ],
   "data": [
     { "query": "Od rana nie mogę się zalogować do panelu, co mam zrobić?" },
