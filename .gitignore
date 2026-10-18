@@ -3,3 +3,5 @@ infra/.terraform/
 infra/*.tfstate*
 infra/.terraform.lock.hcl
 __pycache__/
+.azure/
+azure.yaml

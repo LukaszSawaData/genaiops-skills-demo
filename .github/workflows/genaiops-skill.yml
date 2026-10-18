@@ -8,23 +8,21 @@ on:
     paths: ["skills/**"]
 
 permissions:
-  id-token: write   # logowanie do Azure przez OIDC (bez sekretów z hasłami)
+  id-token: write
   contents: read
 
 env:
   SKILL: support-policy
   FOUNDRY_PROJECT_ENDPOINT: ${{ vars.FOUNDRY_PROJECT_ENDPOINT }}
-  STAGING_TOOLBOX: support-toolbox-staging
+  MODEL_DEPLOYMENT: ${{ vars.JUDGE_MODEL_DEPLOYMENT }}
 
 jobs:
-  # 1. CI: szybkie sprawdzenie bez kosztów LLM
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: python scripts/validate_skill.py
 
-  # 2. Nowa wersja skilla -> staging -> ewaluacja (staging vs produkcja)
   stage-and-evaluate:
     needs: lint
     runs-on: ubuntu-latest
@@ -43,24 +41,28 @@ jobs:
         id: publish
         run: echo "version=$(python scripts/foundry_skills.py publish $SKILL | tail -1)" >> "$GITHUB_OUTPUT"
 
-      - name: Przypnij toolbox STAGING do tej wersji
-        run: python scripts/foundry_skills.py pin $SKILL ${{ steps.publish.outputs.version }}
+      - name: Wdróż tę wersję na agenta STAGING
+        id: stage
+        run: echo "agent=$(python scripts/foundry_skills.py stage $SKILL ${{ steps.publish.outputs.version }} | tail -1)" >> "$GITHUB_OUTPUT"
 
-      - name: Ewaluacja - agent staging vs agent produkcyjny (baseline)
+      - name: Bieżąca wersja agenta produkcyjnego (baseline)
+        id: prod
+        run: echo "agent=$(python scripts/foundry_skills.py current support-agent | tail -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Ewaluacja - staging vs produkcja
         uses: microsoft/ai-agent-evals@v3-beta
         with:
           azure-ai-project-endpoint: ${{ vars.FOUNDRY_PROJECT_ENDPOINT }}
-          deployment-name: ${{ vars.JUDGE_MODEL_DEPLOYMENT }}   # model-sędzia dla ewaluatorów AI
-          agent-ids: "support-agent-staging:1,support-agent:1"
-          baseline-agent-id: "support-agent:1"
+          deployment-name: ${{ vars.JUDGE_MODEL_DEPLOYMENT }}
+          agent-ids: "${{ steps.stage.outputs.agent }},${{ steps.prod.outputs.agent }}"
+          baseline-agent-id: ${{ steps.prod.outputs.agent }}
           data-path: ${{ github.workspace }}/evals/support-policy.json
 
-  # 3. CD: promocja na produkcję tylko z main i po akceptacji człowieka
   promote:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: stage-and-evaluate
     runs-on: ubuntu-latest
-    environment: production   # w ustawieniach repo: required reviewers = bramka jakości
+    environment: production
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v2
@@ -69,5 +71,5 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - run: pip install azure-ai-projects azure-identity
-      - name: Ustaw nową wersję jako domyślną (produkcja ją podchwyci bez redeployu agenta)
+      - name: default_version = nowa wersja + nowa wersja agenta produkcyjnego
         run: python scripts/foundry_skills.py promote $SKILL ${{ needs.stage-and-evaluate.outputs.version }}
