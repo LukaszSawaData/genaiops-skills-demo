@@ -36,21 +36,13 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - run: pip install azure-ai-projects azure-identity
-
-      - name: Opublikuj nową wersję skilla (jeszcze nie domyślną)
-        id: publish
+      - id: publish
         run: echo "version=$(python scripts/foundry_skills.py publish $SKILL | tail -1)" >> "$GITHUB_OUTPUT"
-
-      - name: Wdróż tę wersję na agenta STAGING
-        id: stage
+      - id: stage
         run: echo "agent=$(python scripts/foundry_skills.py stage $SKILL ${{ steps.publish.outputs.version }} | tail -1)" >> "$GITHUB_OUTPUT"
-
-      - name: Bieżąca wersja agenta produkcyjnego (baseline)
-        id: prod
+      - id: prod
         run: echo "agent=$(python scripts/foundry_skills.py current support-agent | tail -1)" >> "$GITHUB_OUTPUT"
-
-      - name: Ewaluacja - staging vs produkcja
-        uses: microsoft/ai-agent-evals@v3-beta
+      - uses: microsoft/ai-agent-evals@v3-beta
         with:
           azure-ai-project-endpoint: ${{ vars.FOUNDRY_PROJECT_ENDPOINT }}
           deployment-name: ${{ vars.JUDGE_MODEL_DEPLOYMENT }}
@@ -71,5 +63,4 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - run: pip install azure-ai-projects azure-identity
-      - name: default_version = nowa wersja + nowa wersja agenta produkcyjnego
-        run: python scripts/foundry_skills.py promote $SKILL ${{ needs.stage-and-evaluate.outputs.version }}
+      - run: python scripts/foundry_skills.py promote $SKILL ${{ needs.stage-and-evaluate.outputs.version }}
